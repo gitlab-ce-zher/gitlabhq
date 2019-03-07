@@ -138,7 +138,7 @@ module Ci
 
     acts_as_taggable
 
-    add_authentication_token_field :token, encrypted: true, fallback: true
+    add_authentication_token_field :token, encrypted: :optional
 
     before_save :update_artifacts_size, if: :artifacts_file_changed?
     before_save :ensure_token
@@ -735,7 +735,7 @@ module Ci
 
     # Virtual deployment status depending on the environment status.
     def deployment_status
-      return nil unless starts_environment?
+      return unless starts_environment?
 
       if success?
         return successful_deployment_status
