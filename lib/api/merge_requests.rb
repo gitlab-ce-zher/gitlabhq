@@ -12,6 +12,9 @@ module API
     helpers do
       params :optional_params_ee do
       end
+
+      params :optional_merge_requests_search_params do
+      end
     end
 
     def self.update_params_at_least_one_of
@@ -45,7 +48,7 @@ module API
         return merge_requests if args[:view] == 'simple'
 
         merge_requests
-          .preload(:notes, :author, :assignee, :milestone, :latest_merge_request_diff, :labels, :timelogs, metrics: [:latest_closed_by, :merged_by])
+          .with_api_entity_associations
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
@@ -112,6 +115,8 @@ module API
         optional :search, type: String, desc: 'Search merge requests for text present in the title, description, or any combination of these'
         optional :in, type: String, desc: '`title`, `description`, or a string joining them with comma'
         optional :wip, type: String, values: %w[yes no], desc: 'Search merge requests for WIP in the title'
+
+        use :optional_merge_requests_search_params
         use :pagination
       end
     end
