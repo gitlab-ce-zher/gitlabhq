@@ -75,13 +75,11 @@ module Gitlab
 
       @certs = stub_cert_paths.flat_map do |cert_file|
         File.read(cert_file).scan(PEM_REGEX).map do |cert|
-          begin
-            OpenSSL::X509::Certificate.new(cert).to_pem
-          rescue OpenSSL::OpenSSLError => e
-            Rails.logger.error "Could not load certificate #{cert_file} #{e}"
-            Gitlab::Sentry.track_exception(e, extra: { cert_file: cert_file })
-            nil
-          end
+          OpenSSL::X509::Certificate.new(cert).to_pem
+        rescue OpenSSL::OpenSSLError => e
+          Rails.logger.error "Could not load certificate #{cert_file} #{e}"
+          Gitlab::Sentry.track_exception(e, extra: { cert_file: cert_file })
+          nil
         end.compact
       end.uniq.join("\n")
     end
@@ -257,8 +255,7 @@ module Gitlab
       # This is this actual number of times this call was made. Used for information purposes only
       actual_call_count = increment_call_count("gitaly_#{call_site}_actual")
 
-      # Do no enforce limits in production
-      return if Rails.env.production? || ENV["GITALY_DISABLE_REQUEST_LIMITS"]
+      return unless enforce_gitaly_request_limits?
 
       # Check if this call is nested within a allow_n_plus_1_calls
       # block and skip check if it is
@@ -274,6 +271,19 @@ module Gitlab
 
       raise TooManyInvocationsError.new(call_site, actual_call_count, max_call_count, max_stacks)
     end
+
+    def self.enforce_gitaly_request_limits?
+      # We typically don't want to enforce request limits in production
+      # However, we have some production-like test environments, i.e., ones
+      # where `Rails.env.production?` returns `true`. We do want to be able to
+      # check if the limit is being exceeded while testing in those environments
+      # In that case we can use a feature flag to indicate that we do want to
+      # enforce request limits.
+      return true if feature_enabled?('enforce_requests_limits')
+
+      !(Rails.env.production? || ENV["GITALY_DISABLE_REQUEST_LIMITS"])
+    end
+    private_class_method :enforce_gitaly_request_limits?
 
     def self.allow_n_plus_1_calls
       return yield unless Gitlab::SafeRequestStore.active?

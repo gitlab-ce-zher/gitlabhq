@@ -3,6 +3,7 @@ import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import emojiAliases from 'emojis/aliases.json';
 import axios from '../lib/utils/axios_utils';
+import csrf from '../lib/utils/csrf';
 
 import AccessorUtilities from '../lib/utils/accessor';
 
@@ -24,11 +25,15 @@ export function initEmojiMap() {
       resolve(emojiMap);
     } else {
       // We load the JSON from server
-      axios
-        .get(
-          `${gon.asset_host || ''}${gon.relative_url_root ||
-            ''}/-/emojis/${EMOJI_VERSION}/emojis.json`,
-        )
+      const axiosInstance = axios.create();
+
+      // If the static JSON file is on a CDN we don't want to send the default CSRF token
+      if (gon.asset_host) {
+        delete axiosInstance.defaults.headers.common[csrf.headerKey];
+      }
+
+      axiosInstance
+        .get(`${gon.relative_url_root || ''}/-/emojis/${EMOJI_VERSION}/emojis.json`)
         .then(({ data }) => {
           emojiMap = data;
           validEmojiNames = [...Object.keys(emojiMap), ...Object.keys(emojiAliases)];

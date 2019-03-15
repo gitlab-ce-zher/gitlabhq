@@ -65,7 +65,7 @@ GEM
     atomic (1.1.99)
     attr_encrypted (3.1.0)
       encryptor (~> 3.0.0)
-    attr_required (1.0.0)
+    attr_required (1.0.1)
     awesome_print (1.8.0)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -398,7 +398,6 @@ GEM
       activesupport
       multipart-post
       oauth (~> 0.5, >= 0.5.0)
-    jquery-atwho-rails (1.3.2)
     js_regex (3.1.1)
       character_set (~> 1.1)
       regexp_parser (~> 1.1)
@@ -622,12 +621,12 @@ GEM
     rack-attack (4.4.1)
       rack
     rack-cors (1.0.2)
-    rack-oauth2 (1.2.3)
-      activesupport (>= 2.3)
-      attr_required (>= 0.0.5)
-      httpclient (>= 2.4)
-      multi_json (>= 1.3.6)
-      rack (>= 1.1)
+    rack-oauth2 (1.9.3)
+      activesupport
+      attr_required
+      httpclient
+      json-jwt (>= 1.9.0)
+      rack
     rack-protection (2.0.5)
       rack
     rack-proxy (0.6.0)
@@ -680,7 +679,7 @@ GEM
       optimist (>= 3.0.0)
     rdoc (6.0.4)
     re2 (1.1.1)
-    recaptcha (3.0.0)
+    recaptcha (4.13.1)
       json
     recursive-open-struct (1.1.0)
     redis (3.3.5)
@@ -1046,7 +1045,6 @@ DEPENDENCIES
   influxdb (~> 0.2)
   jaeger-client (~> 0.10.0)
   jira-ruby (~> 1.4)
-  jquery-atwho-rails (~> 1.3.2)
   js_regex (~> 3.1)
   json-schema (~> 2.8.0)
   jwt (~> 2.1.0)
@@ -1103,7 +1101,7 @@ DEPENDENCIES
   rack (= 2.0.6)
   rack-attack (~> 4.4.1)
   rack-cors (~> 1.0.0)
-  rack-oauth2 (~> 1.2.1)
+  rack-oauth2 (~> 1.9.3)
   rack-proxy (~> 0.6.0)
   rails (= 5.0.7.1)
   rails-controller-testing
@@ -1115,7 +1113,7 @@ DEPENDENCIES
   rbtrace (~> 0.4)
   rdoc (~> 6.0)
   re2 (~> 1.1.1)
-  recaptcha (~> 3.0)
+  recaptcha (~> 4.11)
   redis (~> 3.2)
   redis-namespace (~> 1.6.0)
   redis-rails (~> 5.0.2)

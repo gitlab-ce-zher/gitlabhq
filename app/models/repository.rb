@@ -265,16 +265,14 @@ class Repository
   # to avoid unnecessary syncing.
   def keep_around(*shas)
     shas.each do |sha|
-      begin
-        next unless sha.present? && commit_by(oid: sha)
+      next unless sha.present? && commit_by(oid: sha)
 
-        next if kept_around?(sha)
+      next if kept_around?(sha)
 
-        # This will still fail if the file is corrupted (e.g. 0 bytes)
-        raw_repository.write_ref(keep_around_ref_name(sha), sha)
-      rescue Gitlab::Git::CommandError => ex
-        Rails.logger.error "Unable to create keep-around reference for repository #{disk_path}: #{ex}"
-      end
+      # This will still fail if the file is corrupted (e.g. 0 bytes)
+      raw_repository.write_ref(keep_around_ref_name(sha), sha)
+    rescue Gitlab::Git::CommandError => ex
+      Rails.logger.error "Unable to create keep-around reference for repository #{disk_path}: #{ex}"
     end
   end
 
@@ -534,10 +532,9 @@ class Repository
   end
 
   def root_ref
-    # When the repo does not exist, or there is no root ref, we raise this error so no data is cached.
-    raw_repository&.root_ref or raise Gitlab::Git::Repository::NoRepository # rubocop:disable Style/AndOr
+    raw_repository&.root_ref
   end
-  cache_method :root_ref
+  cache_method_asymmetrically :root_ref
 
   # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/314
   def exists?
